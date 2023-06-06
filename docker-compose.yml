@@ -1,14 +1,15 @@
 version: "3"
 services:
   app:
-    build: .
+    container_name: app
+    build: ./docker_images/app
+    volumes:
+      - ./docker_images/app/src:/usr/src/app
+    command: flask run --host=0.0.0.0
     ports:
       - "5001:5000"
-    container_name: app
-    volumes:
-      - ./app:/usr/src/app
-    command: flask run --host=0.0.0.0
   db:
+    container_name: db
     image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=password

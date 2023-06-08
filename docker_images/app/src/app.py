@@ -19,9 +19,14 @@ def index():
         cursorclass=pymysql.cursors.DictCursor,
     )
     with connection.cursor() as cursor:
+        # cursor.executeのINSERT文のサンプルコード作成
+        cursor.execute("INSERT INTO `product` (`id`, `name`) VALUES (1, 'test')")
         cursor.execute("SELECT * FROM `product`")
         result = cursor.fetchall()
 
+    print("test print")
     print(result)
-    
-    return "index page"
+
+    # resultのdictをstringに変換して表示する
+    result = str(result) + '\ntest'
+    return result

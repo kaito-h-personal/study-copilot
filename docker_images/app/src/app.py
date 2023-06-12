@@ -30,6 +30,5 @@ def test_page_post_json():
 # 例: curl -X POST -F "password=test_password" http://localhost:5001/test_post
 @app.route("/test_post", methods=["POST"])
 def test_page_post():
-    # p = request.form.get('password')
     p = request.form['password']
     return jsonify({"id": 3, "password": p})

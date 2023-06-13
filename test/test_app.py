@@ -1,5 +1,6 @@
 import pytest
-from app import app
+
+import app
 
 
 # test_page_post_jsonのテストコード

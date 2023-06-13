@@ -4,7 +4,8 @@ services:
     container_name: app
     build: ./docker_images/app
     volumes:
-      - ./docker_images/app/src:/usr/src/app
+      - ./src:/usr/src/app
+      - ./test:/usr/src/app
     command: flask run --host=0.0.0.0 --debugger --reload
     ports:
       - "5001:5000"

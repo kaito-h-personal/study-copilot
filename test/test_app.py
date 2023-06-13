@@ -1,6 +1,6 @@
 import pytest
 
-import app
+import app  # TODO: imortがうまくできない
 
 
 # test_page_post_jsonのテストコード

@@ -4,21 +4,21 @@ from flask import Flask, jsonify, request
 
 import pymysql
 
-app = Flask(__name__)
+flask_app = Flask(__name__)
+connection = pymysql.connect(
+    host="db",
+    port=3306,
+    user="dbuser",
+    password="pasuwaado",
+    database="db",
+    charset="utf8mb4",
+    cursorclass=pymysql.cursors.DictCursor,
+)
 
 
-@app.route("/")
+@flask_app.route("/")
 def index():
     # pymysqlを使用してDBからデータを取得して表示する
-    connection = pymysql.connect(
-        host="db",
-        port=3306,
-        user="dbuser",
-        password="pasuwaado",
-        database="db",
-        charset="utf8mb4",
-        cursorclass=pymysql.cursors.DictCursor,
-    )
     with connection.cursor() as cursor:
         # cursor.executeのINSERT文のサンプルコード作成
         cursor.execute("INSERT INTO `product` (`id`, `name`) VALUES (1, 'test')")
@@ -33,8 +33,8 @@ def index():
     return result
 
 
-@app.route("/test")
-def test_page():
+@flask_app.route("/sample")
+def sample_page():
     d = {"name": "test", "age": 20}
     # jsonifyを使うと、json形式で返してくれる
     return jsonify(d)
@@ -42,16 +42,26 @@ def test_page():
 
 # jsonで受け取る
 # 例: curl -X POST -H "Content-Type: application/json" -d '{"password": "test_password"}' http://localhost:5001/test_post_json
-@app.route("/test_post_json", methods=["POST"])
-def test_page_post_json():
+@flask_app.route("/sample_post_json", methods=["POST"])
+def sample_page_post_json():
     d = request.get_json()
     print(d)
     return jsonify(d)
 
 
-# フォームで受け取る
-# 例: curl -X POST -F "password=test_password" http://localhost:5001/test_post
-@app.route("/test_post", methods=["POST"])
-def test_page_post():
-    p = request.form['password']
-    return jsonify({"id": 3, "password": p})
+# pymysqlでproductの中身を取得してjsonで返すGETメソッド
+@flask_app.route("/product", methods=["GET"])
+def product_get():
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM `product`")
+        result = cursor.fetchall()
+    return jsonify(result)
+
+
+# 引数でproductのidとmemo(テキスト)を受けとってpymysqlでproductのmemoにINSERTするPOSTメソッド
+@flask_app.route("/product/<int:id>/<string:memo>", methods=["POST"])
+def product_post(id, memo):
+    with connection.cursor() as cursor:
+        result = cursor.execute("INSERT INTO `product` (`id`, `col`) VALUES (%s, %s)", (id, memo))
+        connection.commit()  # データベースの変更を確定する
+    return jsonify(result)

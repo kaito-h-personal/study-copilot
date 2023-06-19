@@ -46,3 +46,34 @@ def test_product_get():
     # レスポンスを検証
     assert response.status_code == 200
     assert response.json == exp_data
+
+# product_postのテストコード
+def test_product_post():
+    app.flask_app.config['TESTING'] = True
+    client = app.flask_app.test_client()
+    
+    # テーブルをクリアする
+    with app.connection.cursor() as cursor:
+        cursor.execute("DELETE FROM `product` where id=1")
+        app.connection.commit()
+
+
+    # テスト用のデータを作成
+    exp_data = [{"id": 1, "name": None, "col": "testmemo"}]
+    json_data = json.dumps(exp_data)
+
+    #POSTリクエストを送信
+    response = client.post(
+        "/product/1/testmemo",
+        content_type="application/json"
+    )
+
+    # レスポンスを検証
+    assert response.status_code == 200
+
+    # mysqlのデータを検証 productテーブルの中身が1行でid=1, name=test, memo=testmemoになっていることを確認する
+    with app.connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM `product` where id=1")
+        result = cursor.fetchall()
+        print(result)
+    assert result == exp_data

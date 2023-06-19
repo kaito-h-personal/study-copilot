@@ -54,3 +54,12 @@ def product_get():
         cursor.execute("SELECT * FROM `product`")
         result = cursor.fetchall()
     return jsonify(result)
+
+# 引数でproductのidとmemo(テキスト)を受けとってpymysqlでproductのmemoにINSERTするPOSTメソッド
+@flask_app.route("/product/<int:id>/<string:memo>", methods=["POST"])
+def product_post(id, memo):
+    with connection.cursor() as cursor:
+        result = cursor.execute("INSERT INTO `product` (`id`, `col`) VALUES (%s, %s)", (id, memo))
+        # cursor.execute("SELECT * FROM `product`")
+        # result = cursor.fetchall()
+    return jsonify(result)

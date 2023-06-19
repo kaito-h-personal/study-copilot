@@ -6,14 +6,15 @@ import pymysql
 
 flask_app = Flask(__name__)
 connection = pymysql.connect(
-        host="db",
-        port=3306,
-        user="dbuser",
-        password="pasuwaado",
-        database="db",
-        charset="utf8mb4",
-        cursorclass=pymysql.cursors.DictCursor,
-    )
+    host="db",
+    port=3306,
+    user="dbuser",
+    password="pasuwaado",
+    database="db",
+    charset="utf8mb4",
+    cursorclass=pymysql.cursors.DictCursor,
+)
+
 
 @flask_app.route("/")
 def index():
@@ -47,6 +48,7 @@ def sample_page_post_json():
     print(d)
     return jsonify(d)
 
+
 # pymysqlでproductの中身を取得してjsonで返すGETメソッド
 @flask_app.route("/product", methods=["GET"])
 def product_get():
@@ -55,11 +57,11 @@ def product_get():
         result = cursor.fetchall()
     return jsonify(result)
 
+
 # 引数でproductのidとmemo(テキスト)を受けとってpymysqlでproductのmemoにINSERTするPOSTメソッド
 @flask_app.route("/product/<int:id>/<string:memo>", methods=["POST"])
 def product_post(id, memo):
     with connection.cursor() as cursor:
         result = cursor.execute("INSERT INTO `product` (`id`, `col`) VALUES (%s, %s)", (id, memo))
-        # cursor.execute("SELECT * FROM `product`")
-        # result = cursor.fetchall()
+        connection.commit()  # データベースの変更を確定する
     return jsonify(result)

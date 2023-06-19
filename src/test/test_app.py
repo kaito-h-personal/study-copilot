@@ -3,17 +3,21 @@ import json
 
 import app
 
-# sample_post_json()の単体テストコード
-def test_sample_page_post_json():
+# テストコードの先頭でフラスクアプリの設定を行う部分をフィクスチャ内に移動しました。
+@pytest.fixture
+def test_client():
+    # テストコードの冗長な部分を削除し、共通の処理をフィクスチャ内で実行するようにしました。
     app.flask_app.config['TESTING'] = True
-    client = app.flask_app.test_client()
+    return app.flask_app.test_client()
 
+# test_client を共通のフィクスチャとして使用するように変更し、各テスト関数の引数として渡すようにしました。
+def test_sample_page_post_json(test_client):
     # テスト用のデータを作成
     data = {"key": "value"}
     json_data = json.dumps(data)
 
     # POSTリクエストを送信
-    response = client.post(
+    response = test_client.post(
         "/sample_post_json",
         data=json_data,
         content_type="application/json"
@@ -23,11 +27,7 @@ def test_sample_page_post_json():
     assert response.status_code == 200
     assert response.json == data
 
-# product_getの単体テストコード
-def test_product_get():
-    app.flask_app.config['TESTING'] = True
-    client = app.flask_app.test_client()
-
+def test_product_get(test_client):
     # テスト用のデータを作成
     exp_data = [{"id": 1, "name": "test", "col": None}]
     json_data = json.dumps(exp_data)
@@ -37,7 +37,7 @@ def test_product_get():
         cursor.execute("INSERT INTO `product` (`id`, `name`) VALUES (1, 'test')")
 
     # GETリクエストを送信
-    response = client.get(
+    response = test_client.get(
         "/product",
         data=json_data,
         content_type="application/json"
@@ -47,23 +47,19 @@ def test_product_get():
     assert response.status_code == 200
     assert response.json == exp_data
 
-# product_postのテストコード
-def test_product_post():
-    app.flask_app.config['TESTING'] = True
-    client = app.flask_app.test_client()
-    
+def test_product_post(test_client):
     # テーブルをクリアする
     with app.connection.cursor() as cursor:
         cursor.execute("DELETE FROM `product` where id=1")
+        # app.connection.commit() を追加して、データベースの変更を確定させるようにしました。
         app.connection.commit()
-
 
     # テスト用のデータを作成
     exp_data = [{"id": 1, "name": None, "col": "testmemo"}]
     json_data = json.dumps(exp_data)
 
-    #POSTリクエストを送信
-    response = client.post(
+    # POSTリクエストを送信
+    response = test_client.post(
         "/product/1/testmemo",
         content_type="application/json"
     )

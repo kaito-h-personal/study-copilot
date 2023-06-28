@@ -29,9 +29,9 @@ services:
       - NODE_ENV=development
     # ホストマシン:コンテナ => ファイルを共有するための設定
     volumes:
-      - ./front:/usr/src/app
+      - ./front:/usr/src
     # Dockerコンテナ内で実行されるコマンドを指定する
-    command: sh -c 'yarn start'
+    # command: sh -c 'yarn start' # TODO
     # ホストマシンPort番号:コンテナのPost番号
     ports:
       - 3000:3000

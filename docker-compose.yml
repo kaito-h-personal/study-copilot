@@ -31,7 +31,7 @@ services:
     volumes:
       - ./front:/usr/src
     # Dockerコンテナ内で実行されるコマンドを指定する
-    # command: sh -c 'yarn start' # TODO
+    command: sh -c "cd src && npm install && yarn start"
     # ホストマシンPort番号:コンテナのPost番号
     ports:
       - 3000:3000
